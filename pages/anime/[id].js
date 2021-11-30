@@ -137,7 +137,7 @@ export default function Anime() {
                     <link rel="icon" href="https://www.cruisebound.com/favicon.ico" />
                 </Head>
 
-                <Grid container>
+                <Grid container sx={{ backgroundColor: 'lightblue' }}>
                     <Grid item={true} xs={12} sx={{ display: 'flex', justifyContent: 'center', pt: 3 }}>
                         <Typography variant="h4" color="initial">{currentAnime.title}</Typography>
                     </Grid>
@@ -193,7 +193,7 @@ export default function Anime() {
                             </Grid>
                         </Card>
                     </Grid>
-                    <Grid container item={true} xs={12} md={9} sx={{ backgroundColor: 'orange' }}>
+                    <Grid container item={true} xs={12} md={9}>
                         <Grid sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
                             <Typography gutterBottom variant="body1" sx={{ pt: 0.5, pl: 3 }}>
                                 {currentAnime.description}
@@ -211,14 +211,13 @@ export default function Anime() {
                                 <Grid key={char.id} item={true} xs={12} md={6} lg={4} xl={3} p={2} sx={{ display: 'flex', justifyContent: 'center' }}>
                                     <Card sx={{ minWidth: '200px', maxWidth: "300px", maxHeight: '300px', position: 'relative' }}>
                                         <CardMedia
-                                            sx={{ cursor: 'pointer' }}
                                             component="img"
                                             alt={char.name}
                                             image={char.img}
                                         />
 
                                         <Box sx={{ position: 'absolute', top: '84%', backgroundColor: 'rgba(0,0,0,0.8)', width: '100%', color: 'white' }}>
-                                            <CardContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                                            <CardContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                                 <Typography variant="body2" component="div" fontSize={12}>
                                                     {char.name}
                                                 </Typography>

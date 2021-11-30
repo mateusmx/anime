@@ -7,6 +7,13 @@ export const setAnimes = (animes) => (dispatch) => {
     });
 };
 
+export const setNextPage = (nextLink) => (dispatch) => {
+    dispatch({
+        type: t.SET_NEXT_PAGE,
+        payload: nextLink,
+    });
+};
+
 export const toggleFavoriteAnime = (animeId) => (dispatch) => {
     dispatch({
         type: t.TOGGLE_FAVORITE_ANIME,
@@ -22,7 +29,6 @@ export const toggleStarredAnime = (animeId) => (dispatch) => {
 };
 
 export const toggleWatchedEpisode = (episodeId) => (dispatch) => {
-    console.log("Action toggle watched episode");
     dispatch({
         type: t.TOGGLE_WATCHED_EPISODE,
         payload: episodeId,

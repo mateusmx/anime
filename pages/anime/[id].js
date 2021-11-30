@@ -96,12 +96,9 @@ export default function Anime() {
             mediaArray.map(async (link) => {
                 const mediaResponse = await ax.get(`${link}/character`);
                 const char = mediaResponse.data.data
-
                 let character = {};
                 character.id = char.id;
                 character.name = char.attributes.name;
-
-
                 character.img = char.attributes.image && (char.attributes.image.original || char.attributes.image.medium);
                 if (!characters.includes(char)) {
                     setCharacters((char) => [...char, character]);
@@ -122,7 +119,6 @@ export default function Anime() {
     }
 
     const handleEpisode = (episodeId) => {
-        console.log("HandleEpisode");
         dispatch(toggleWatchedEpisode(episodeId));
     }
 
@@ -142,8 +138,6 @@ export default function Anime() {
                 </Head>
 
                 <Grid container>
-
-
                     <Grid item={true} xs={12} sx={{ display: 'flex', justifyContent: 'center', pt: 3 }}>
                         <Typography variant="h4" color="initial">{currentAnime.title}</Typography>
                     </Grid>
@@ -240,7 +234,6 @@ export default function Anime() {
                             </Typography>
                             <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
                                 {!loading && episodes.map((episode) => {
-
                                     return (
                                         <Grid key={episode.id} sx={{ display: 'flex', alignItems: 'start', justifyContent: 'start' }}>
                                             <Button size="small" onClick={() => handleEpisode(episode.id)}>
@@ -252,11 +245,8 @@ export default function Anime() {
                                 })}
                             </Typography>
                             <Grid>
-
                             </Grid>
                         </Grid>
-
-
                     </Grid>
                 </Grid>
             </>

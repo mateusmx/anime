@@ -3,6 +3,7 @@ import * as t from '../types';
 const main = (
     state = {
         animes: [],
+        animes: '',
         starredAnimes: [],
         favoriteAnimes: [],
         watchedEpisodes: [],
@@ -13,7 +14,13 @@ const main = (
         case t.SET_ANIMES:
             return {
                 ...state,
-                animes: [...state.animes, action.payload],
+                animes: action.payload,
+            };
+
+        case t.SET_NEXT_PAGE:
+            return {
+                ...state,
+                next: action.payload,
             };
 
         case t.TOGGLE_FAVORITE_ANIME:

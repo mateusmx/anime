@@ -16,8 +16,7 @@ function MyApp({ Component, pageProps }) {
     const starredArray = [...window.localStorage.getItem('starredAnimes') || []]
     const watchedArray = [window.localStorage.getItem('watchedEpisodes') || []]
 
-    console.log("WATCHED ARRAY", watchedArray);
-    if (watchedArray.length > 0) {
+    if (watchedArray.length > 0 && watchedArray[0].length > 0) {
       const splitting = watchedArray[0].split(",");
       const watched = [];
       splitting.map((val) => {

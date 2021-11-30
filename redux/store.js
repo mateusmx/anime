@@ -3,6 +3,7 @@ import thunk from 'redux-thunk';
 import { createWrapper } from 'next-redux-wrapper';
 import rootReducer from './reducers/rootReducer';
 
+
 const middleware = [thunk];
 
 // const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

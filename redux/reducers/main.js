@@ -12,12 +12,12 @@ const main = (
         case t.SET_ANIMES:
             return {
                 ...state,
-                animes: action.payload,
+                animes: [...state.animes, action.payload],
             };
 
         case t.TOGGLE_FAVORITE_ANIME:
-            const oldState = { ...state };
-            let favorite = [...oldState.favoriteAnimes];
+            const oldStateFavorite = { ...state };
+            let favorite = [...oldStateFavorite.favoriteAnimes];
             if (favorite.includes(action.payload)) {
                 favorite.map((id, index) => {
                     if (id === action.payload) {

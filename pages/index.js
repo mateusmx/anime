@@ -12,6 +12,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchIcon from '@mui/icons-material/Search';
 
 import AnimeCardComponent from '../components/AnimeCardComponent';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 
 export default function Home() {
@@ -19,6 +20,8 @@ export default function Home() {
   const dispatch = useDispatch();
   const starredAnimes = useSelector(state => state.main.starredAnimes)
   const favoriteAnimes = useSelector(state => state.main.favoriteAnimes)
+  const [next, setNext] = useState('');
+  const [hasMore, setHasMore] = useState(true);
   const [availableAnimes, setAvailableAnimes] = useState([]);
   const [displayingAnimes, setDisplayingAnimes] = useState([]);
   const [favoriteFilter, setFavoriteFilter] = useState(false);
@@ -40,18 +43,15 @@ export default function Home() {
         anime.img = data.attributes.posterImage.medium;
         anime.rating = data.attributes.averageRating
         anime.favorites = data.attributes.favoritesCount
-
         animesArray.push(anime);
       })
       dispatch(setAnimes(animesArray));
       setAvailableAnimes(animesArray);
       setDisplayingAnimes(animesArray);
+
+      setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
     }
   }, [])
-
-  useEffect(() => {
-
-  }, [favoriteAnimes])
 
   const handleFavoriteClick = () => {
     if (favoriteFilter) {
@@ -87,6 +87,36 @@ export default function Home() {
     setStarredFilter(!starredFilter);
   }
 
+  const fetchMoreData = async () => {
+    console.log("Entered fetch more data");
+    if (availableAnimes.length >= 17253) {
+      setHasMore(false);
+      return;
+    }
+    // a fake async api call like which sends
+    // 20 more records in .5 secs
+
+
+    const response = await ax.get(next);
+    const animesArray = [];
+    response.data.data.map((data) => {
+      let anime = {};
+      anime.id = data.id;
+      anime.title = data.attributes.titles.en || data.attributes.titles.en_jp;
+      anime.synopsis = data.attributes.synopsis
+      anime.img = data.attributes.posterImage.medium;
+      anime.rating = data.attributes.averageRating
+      anime.favorites = data.attributes.favoritesCount
+      setAvailableAnimes((available) => [...available, anime]);
+      setDisplayingAnimes((available) => [...available, anime]);
+      animesArray.push(anime);
+    })
+    dispatch(setAnimes(animesArray));
+
+    setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
+    console.log(displayingAnimes);
+
+  };
 
   return (
     <>
@@ -122,7 +152,7 @@ export default function Home() {
               }}
               freeSolo
               disableClearable
-              options={displayingAnimes.map((option) => option.title)}
+              options={displayingAnimes.length > 1 ? displayingAnimes.map((option) => option.title) : []}
               renderInput={(params) => (
                 <TextField
                   sx={{ borderRadius: "50px", padding: "0px" }}
@@ -153,6 +183,25 @@ export default function Home() {
             return (<AnimeCardComponent key={anime.id} anime={anime} />)
           })
         ) : (favoriteFilter || starredFilter || searchFilter) ? ('No matching criteria, try another filter') : ('Loading ...')}
+
+        {(favoriteFilter || starredFilter || searchFilter) ? null : (
+          <InfiniteScroll
+            dataLength={availableAnimes.length}
+            next={fetchMoreData}
+            hasMore={hasMore}
+            loader={<h4>Loading more awesome Animes ...</h4>}
+            endMessage={
+              <div>
+                Looks like those are all the animes
+              </div>
+            }
+          >
+          </InfiniteScroll>
+        )}
+
+
+
+
 
       </Grid>
     </>

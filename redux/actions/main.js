@@ -21,6 +21,14 @@ export const toggleStarredAnime = (animeId) => (dispatch) => {
     });
 };
 
+export const toggleWatchedEpisode = (episodeId) => (dispatch) => {
+    console.log("Action toggle watched episode");
+    dispatch({
+        type: t.TOGGLE_WATCHED_EPISODE,
+        payload: episodeId,
+    });
+};
+
 export const initializeFavoriteAnimes = (animes) => (dispatch) => {
     dispatch({
         type: t.INITIALIZE_FAVORITE_ANIMES,
@@ -34,3 +42,12 @@ export const initializeStarredAnimes = (animes) => (dispatch) => {
         payload: animes,
     });
 };
+
+export const initializeWatchedEpisodes = (episodes) => (dispatch) => {
+    dispatch({
+        type: t.INITIALIZE_WATCHED_EPISODES,
+        payload: episodes,
+    });
+};
+
+

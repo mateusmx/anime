@@ -5,6 +5,7 @@ const main = (
         animes: [],
         starredAnimes: [],
         favoriteAnimes: [],
+        watchedEpisodes: [],
     },
     action
 ) => {
@@ -51,6 +52,24 @@ const main = (
                 starredAnimes: starred,
             };
 
+        case t.TOGGLE_WATCHED_EPISODE:
+            const oldStateEpisodes = { ...state };
+            let watched = [...oldStateEpisodes.watchedEpisodes];
+            if (watched.includes(action.payload)) {
+                watched.map((id, index) => {
+                    if (id === action.payload) {
+                        watched.splice(index, 1);
+                    }
+                })
+            } else {
+                watched.push(action.payload);
+            }
+
+            return {
+                ...state,
+                watchedEpisodes: watched,
+            };
+
         case t.INITIALIZE_FAVORITE_ANIMES:
             return {
                 ...state,
@@ -61,6 +80,12 @@ const main = (
             return {
                 ...state,
                 starredAnimes: action.payload,
+            };
+
+        case t.INITIALIZE_WATCHED_EPISODES:
+            return {
+                ...state,
+                watchedEpisodes: action.payload,
             };
 
 

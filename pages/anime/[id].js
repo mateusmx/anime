@@ -55,8 +55,7 @@ export default function Anime() {
                 }
             })
 
-            // anime.description = 
-            // anime.writtenBy = (data.attributes.description).split('\n')[1];
+            // Getting all the details for the anime
             anime.img = data.attributes.posterImage.medium;
             anime.rating = data.attributes.averageRating;
             anime.userCount = data.attributes.userCount;
@@ -69,16 +68,11 @@ export default function Anime() {
             anime.status = data.attributes.status;
             anime.subtype = data.attributes.subtype;
 
-
-            anime.episodesLink = (data.relationships.episodes.links.related).replace('https://kitsu.io/api/edge', '');
-            anime.charactersLink = (data.relationships.characters.links.related).replace('https://kitsu.io/api/edge', '');
-
             setCurrentAnime(anime);
 
+            anime.episodesLink = (data.relationships.episodes.links.related).replace('https://kitsu.io/api/edge', '');
             const episodesResponse = await ax.get(anime.episodesLink);
-
             let episodesArray = [];
-
             episodesResponse.data.data.map((data) => {
                 let episode = {};
                 episode.id = data.id;
@@ -90,6 +84,8 @@ export default function Anime() {
 
             setEpisodes(episodesArray);
 
+
+            anime.charactersLink = (data.relationships.characters.links.related).replace('https://kitsu.io/api/edge', '');
             const charactersResponse = await ax.get(anime.charactersLink);
             let mediaArray = [];
             charactersResponse.data.data.map((links) => {

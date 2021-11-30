@@ -22,13 +22,12 @@ export default function Home() {
   const favoriteAnimes = useSelector(state => state.main.favoriteAnimes)
   const [next, setNext] = useState('');
   const [hasMore, setHasMore] = useState(true);
+  const [limit, setLimit] = useState(100000);
   const [availableAnimes, setAvailableAnimes] = useState([]);
   const [displayingAnimes, setDisplayingAnimes] = useState([]);
   const [favoriteFilter, setFavoriteFilter] = useState(false);
   const [starredFilter, setStarredFilter] = useState(false);
   const [searchFilter, setSearchFilter] = useState(false);
-
-
 
   useEffect(() => {
     getData();
@@ -48,7 +47,7 @@ export default function Home() {
       dispatch(setAnimes(animesArray));
       setAvailableAnimes(animesArray);
       setDisplayingAnimes(animesArray);
-
+      setLimit(response.data.meta.count);
       setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
     }
   }, [])
@@ -56,14 +55,18 @@ export default function Home() {
   const handleFavoriteClick = () => {
     if (favoriteFilter) {
       if (starredFilter) {
+        // Starred filter is active so need to filter available (all) - starred ones.
         setDisplayingAnimes(availableAnimes.filter((anime) => starredAnimes.includes(anime.id)));
       } else {
+        // No filters are applied.
         setDisplayingAnimes([...availableAnimes]);
       }
     } else {
       if (starredFilter) {
+        // Both filters are applied.
         setDisplayingAnimes(displayingAnimes.filter((anime) => starredAnimes.includes(anime.id) && favoriteAnimes.includes(anime.id)));
       } else {
+        // Only Favorite filter is being applied.
         setDisplayingAnimes(displayingAnimes.filter((anime) => favoriteAnimes.includes(anime.id)));
       }
     }
@@ -73,14 +76,18 @@ export default function Home() {
   const handleStarredClick = () => {
     if (starredFilter) {
       if (favoriteFilter) {
+        // Favorite filter is active so need to filter available (all) - favorite ones.
         setDisplayingAnimes(availableAnimes.filter((anime) => favoriteAnimes.includes(anime.id)));
       } else {
+        // No filters are applied.
         setDisplayingAnimes([...availableAnimes]);
       }
     } else {
       if (favoriteFilter) {
+        // Both filters are applied.
         setDisplayingAnimes(displayingAnimes.filter((anime) => starredAnimes.includes(anime.id) && favoriteAnimes.includes(anime.id)));
       } else {
+        // Only Starred filter is being applied.
         setDisplayingAnimes(displayingAnimes.filter((anime) => starredAnimes.includes(anime.id)));
       }
     }
@@ -88,14 +95,12 @@ export default function Home() {
   }
 
   const fetchMoreData = async () => {
-    console.log("Entered fetch more data");
-    if (availableAnimes.length >= 17253) {
+    // If the length of available animes is higher than the limit - 1 = 17253 (17254 is the total provided by the API) 
+    // Then we set the flag that there is no more animes to fetch.
+    if (availableAnimes.length > limit - 1) {
       setHasMore(false);
       return;
     }
-    // a fake async api call like which sends
-    // 20 more records in .5 secs
-
 
     const response = await ax.get(next);
     const animesArray = [];
@@ -112,16 +117,14 @@ export default function Home() {
       animesArray.push(anime);
     })
     dispatch(setAnimes(animesArray));
-
     setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
-    console.log(displayingAnimes);
 
   };
 
   return (
     <>
       <Head>
-        <title>Cruisebound Anime</title>
+        <title>Anime List</title>
         <meta name="description" content="Cruisebound Anime Application" />
         <link rel="icon" href="https://www.cruisebound.com/favicon.ico" />
       </Head>

@@ -13,6 +13,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import AnimeCardComponent from '../components/AnimeCardComponent';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useRouter } from 'next/dist/client/router';
 
 
 export default function Home() {
@@ -22,6 +23,8 @@ export default function Home() {
   const localNext = useSelector(state => state.main.next)
   const starredAnimes = useSelector(state => state.main.starredAnimes)
   const favoriteAnimes = useSelector(state => state.main.favoriteAnimes)
+  const router = useRouter();
+
   const [next, setNext] = useState(localNext);
   const [hasMore, setHasMore] = useState(true);
   const [limit, setLimit] = useState(100000);
@@ -170,7 +173,9 @@ export default function Home() {
               }}
               freeSolo
               disableClearable
-              options={displayingAnimes.length > 1 ? displayingAnimes.map((option) => option.title) : []}
+              options={displayingAnimes.length > 1 ? displayingAnimes.map((option) => { return (option); }) : []}
+              getOptionLabel={(option) => option.title}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
                 <TextField
                   sx={{ borderRadius: "50px", padding: "0px" }}
@@ -188,6 +193,9 @@ export default function Home() {
                   }}
                 />
               )}
+              onChange={(event, value) => {
+                router.push(`/anime/${value.id}`)
+              }}
             />
           </Grid>
           <Grid item={true} xs={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'end' } }}>
@@ -198,7 +206,7 @@ export default function Home() {
         {displayingAnimes.length > 0 ? (
           displayingAnimes.map((anime) => {
 
-            return (<AnimeCardComponent key={anime.id} anime={anime} availableAnimes={availableAnimes} setAvailableAnimes={setAvailableAnimes} />)
+            return (<AnimeCardComponent key={anime.id} anime={anime} />)
           })
         ) : (favoriteFilter || starredFilter || searchFilter) ? ('No matching criteria, try another filter') : ('Loading ...')}
 

@@ -209,7 +209,7 @@ export default function Anime() {
 
                             return (
                                 <Grid key={char.id} item={true} xs={12} md={6} lg={4} xl={3} p={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                    <Card sx={{ minWidth: '200px', maxWidth: "300px", maxHeight: '300px', position: 'relative' }}>
+                                    <Card sx={{ minWidth: '200px', maxWidth: "300px", minHeight: '250px', maxHeight: '300px', position: 'relative' }}>
                                         <CardMedia
                                             component="img"
                                             alt={char.name}

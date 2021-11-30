@@ -3,8 +3,10 @@ import * as t from '../types';
 const main = (
     state = {
         animes: [],
+        animes: '',
         starredAnimes: [],
         favoriteAnimes: [],
+        watchedEpisodes: [],
     },
     action
 ) => {
@@ -12,7 +14,13 @@ const main = (
         case t.SET_ANIMES:
             return {
                 ...state,
-                animes: [...state.animes, action.payload],
+                animes: action.payload,
+            };
+
+        case t.SET_NEXT_PAGE:
+            return {
+                ...state,
+                next: action.payload,
             };
 
         case t.TOGGLE_FAVORITE_ANIME:
@@ -51,6 +59,24 @@ const main = (
                 starredAnimes: starred,
             };
 
+        case t.TOGGLE_WATCHED_EPISODE:
+            const oldStateEpisodes = { ...state };
+            let watched = [...oldStateEpisodes.watchedEpisodes];
+            if (watched.includes(action.payload)) {
+                watched.map((id, index) => {
+                    if (id === action.payload) {
+                        watched.splice(index, 1);
+                    }
+                })
+            } else {
+                watched.push(action.payload);
+            }
+
+            return {
+                ...state,
+                watchedEpisodes: watched,
+            };
+
         case t.INITIALIZE_FAVORITE_ANIMES:
             return {
                 ...state,
@@ -61,6 +87,12 @@ const main = (
             return {
                 ...state,
                 starredAnimes: action.payload,
+            };
+
+        case t.INITIALIZE_WATCHED_EPISODES:
+            return {
+                ...state,
+                watchedEpisodes: action.payload,
             };
 
 

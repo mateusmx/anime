@@ -2,7 +2,7 @@ import Head from 'next/head'
 import ax from '../axiosConfig';
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { setAnimes } from '../redux/actions/main'
+import { setAnimes, setNextPage } from '../redux/actions/main'
 
 import { Typography, Grid, Autocomplete, InputAdornment, TextField, Card, CardMedia, CardContent, CardActions, Button, Box } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -18,19 +18,25 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 export default function Home() {
 
   const dispatch = useDispatch();
+  const localAnimes = useSelector(state => state.main.animes)
+  const localNext = useSelector(state => state.main.next)
   const starredAnimes = useSelector(state => state.main.starredAnimes)
   const favoriteAnimes = useSelector(state => state.main.favoriteAnimes)
-  const [next, setNext] = useState('');
+  const [next, setNext] = useState(localNext);
   const [hasMore, setHasMore] = useState(true);
   const [limit, setLimit] = useState(100000);
-  const [availableAnimes, setAvailableAnimes] = useState([]);
-  const [displayingAnimes, setDisplayingAnimes] = useState([]);
+
+  const [availableAnimes, setAvailableAnimes] = useState(localAnimes ? [...localAnimes] : []);
+  const [displayingAnimes, setDisplayingAnimes] = useState(localAnimes ? [...localAnimes] : []);
   const [favoriteFilter, setFavoriteFilter] = useState(false);
   const [starredFilter, setStarredFilter] = useState(false);
   const [searchFilter, setSearchFilter] = useState(false);
 
   useEffect(() => {
-    getData();
+    if (availableAnimes.length === 0) {
+      getData();
+    }
+
     async function getData() {
       const response = await ax.get('/anime');
       const animesArray = [];
@@ -42,15 +48,25 @@ export default function Home() {
         anime.img = data.attributes.posterImage.medium;
         anime.rating = data.attributes.averageRating
         anime.favorites = data.attributes.favoritesCount
+        setAvailableAnimes((available) => [...available, anime]);
+        setDisplayingAnimes((available) => [...available, anime]);
         animesArray.push(anime);
       })
-      dispatch(setAnimes(animesArray));
-      setAvailableAnimes(animesArray);
-      setDisplayingAnimes(animesArray);
       setLimit(response.data.meta.count);
       setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
     }
   }, [])
+
+  useEffect(() => {
+    dispatch(setAnimes(availableAnimes));
+  }, [availableAnimes])
+
+  useEffect(() => {
+    dispatch(setNextPage(next));
+  }, [next])
+
+
+
 
   const handleFavoriteClick = () => {
     if (favoriteFilter) {
@@ -116,7 +132,6 @@ export default function Home() {
       setDisplayingAnimes((available) => [...available, anime]);
       animesArray.push(anime);
     })
-    dispatch(setAnimes(animesArray));
     setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
 
   };
@@ -183,7 +198,7 @@ export default function Home() {
         {displayingAnimes.length > 0 ? (
           displayingAnimes.map((anime) => {
 
-            return (<AnimeCardComponent key={anime.id} anime={anime} />)
+            return (<AnimeCardComponent key={anime.id} anime={anime} availableAnimes={availableAnimes} setAvailableAnimes={setAvailableAnimes} />)
           })
         ) : (favoriteFilter || starredFilter || searchFilter) ? ('No matching criteria, try another filter') : ('Loading ...')}
 
@@ -201,11 +216,6 @@ export default function Home() {
           >
           </InfiniteScroll>
         )}
-
-
-
-
-
       </Grid>
     </>
   )

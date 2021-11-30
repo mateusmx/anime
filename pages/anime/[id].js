@@ -3,17 +3,15 @@ import Link from 'next/link'
 import ax from '../../axiosConfig';
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { setAnimes, toggleFavoriteAnime, toggleStarredAnime } from '../../redux/actions/main'
+import { setAnimes, toggleFavoriteAnime, toggleStarredAnime, toggleWatchedEpisode } from '../../redux/actions/main'
 
 import { Typography, Grid, Autocomplete, InputAdornment, TextField, Card, CardMedia, CardContent, CardActions, Button, Box } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import SearchIcon from '@mui/icons-material/Search';
+import CheckIcon from '@mui/icons-material/Check';
 
-import AnimeCardComponent from '../../components/AnimeCardComponent';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useRouter } from 'next/dist/client/router';
 
 export default function Anime() {
@@ -25,6 +23,7 @@ export default function Anime() {
     const [loading, setLoading] = useState(true);
     const starredAnimes = useSelector(state => state.main.starredAnimes)
     const favoriteAnimes = useSelector(state => state.main.favoriteAnimes)
+    const watchedEpisodes = useSelector(state => state.main.watchedEpisodes)
     const [characters, setCharacters] = useState([]);
     const [episodes, setEpisodes] = useState([]);
 
@@ -101,9 +100,13 @@ export default function Anime() {
                 let character = {};
                 character.id = char.id;
                 character.name = char.attributes.name;
-                character.img = char.attributes.image.small;
 
-                setCharacters((char) => [...char, character]);
+
+                character.img = char.attributes.image && (char.attributes.image.original || char.attributes.image.medium);
+                if (!characters.includes(char)) {
+                    setCharacters((char) => [...char, character]);
+                }
+
             })
 
             setLoading(false);
@@ -116,6 +119,11 @@ export default function Anime() {
 
     const handleFavorite = () => {
         dispatch(toggleFavoriteAnime(currentAnime.id));
+    }
+
+    const handleEpisode = (episodeId) => {
+        console.log("HandleEpisode");
+        dispatch(toggleWatchedEpisode(episodeId));
     }
 
     if (loading) {
@@ -191,42 +199,64 @@ export default function Anime() {
                             </Grid>
                         </Card>
                     </Grid>
-                    <Grid item={true} xs={12} md={9} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'start', backgroundColor: 'orange' }}>
-
+                    <Grid container item={true} xs={12} md={9} sx={{ backgroundColor: 'orange' }}>
                         <Grid sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start' }}>
                             <Typography gutterBottom variant="body1" sx={{ pt: 0.5, pl: 3 }}>
                                 {currentAnime.description}
                             </Typography>
 
-                            <Grid>
-                                <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
-                                    Characters
-                                </Typography>
-                                <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
-                                    {characters.map((char) => {
-                                        return (<Typography key={char.id}>{char.name}</Typography>)
-                                    })}
-                                </Typography>
-                                <Grid>
-
-                                </Grid>
-                            </Grid>
-
-                            <Grid>
-                                <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
-                                    Episodes
-                                </Typography>
-                                <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
-                                    {episodes.map((episode) => {
-                                        return (<Typography key={episode.id}>{episode.airdate} {episode.number}: {episode.description}</Typography>)
-                                    })}
-                                </Typography>
-                                <Grid>
-
-                                </Grid>
-                            </Grid>
-
                         </Grid>
+                        <Grid item={true} xs={12}>
+                            <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
+                                Characters
+                            </Typography>
+                        </Grid>
+                        {!loading && characters.map((char) => {
+
+                            return (
+                                <Grid key={char.id} item={true} xs={12} md={6} lg={4} xl={3} p={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                    <Card sx={{ minWidth: '200px', maxWidth: "300px", maxHeight: '300px', position: 'relative' }}>
+                                        <CardMedia
+                                            sx={{ cursor: 'pointer' }}
+                                            component="img"
+                                            alt={char.name}
+                                            image={char.img}
+                                        />
+
+                                        <Box sx={{ position: 'absolute', top: '84%', backgroundColor: 'rgba(0,0,0,0.8)', width: '100%', color: 'white' }}>
+                                            <CardContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                                                <Typography variant="body2" component="div" fontSize={12}>
+                                                    {char.name}
+                                                </Typography>
+                                            </CardContent>
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                            )
+                        })}
+                        <Grid container>
+                            <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
+                                Episodes
+                            </Typography>
+                            <Typography gutterBottom variant="h5" sx={{ pt: 0.5, pl: 3 }}>
+                                {!loading && episodes.map((episode) => {
+
+                                    return (
+                                        <Grid key={episode.id} sx={{ display: 'flex', alignItems: 'start', justifyContent: 'start' }}>
+                                            <Button size="small" onClick={() => handleEpisode(episode.id)}>
+                                                {watchedEpisodes.includes(episode.id) ? (<CheckIcon fontSize="medium" sx={{ color: 'green' }} />) : (<CheckIcon fontSize="medium" sx={{ color: 'black' }} />)}
+                                            </Button>
+                                            <Typography>{episode.airdate} {episode.number}: {episode.description}</Typography>
+                                        </Grid>
+                                    )
+                                })}
+                            </Typography>
+                            <Grid>
+
+                            </Grid>
+                        </Grid>
+
+
                     </Grid>
                 </Grid>
             </>

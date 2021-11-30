@@ -42,11 +42,12 @@ export default function Home() {
         anime.img = data.attributes.posterImage.medium;
         anime.rating = data.attributes.averageRating
         anime.favorites = data.attributes.favoritesCount
+        setAvailableAnimes((available) => [...available, anime]);
+        setDisplayingAnimes((available) => [...available, anime]);
         animesArray.push(anime);
       })
       dispatch(setAnimes(animesArray));
-      setAvailableAnimes(animesArray);
-      setDisplayingAnimes(animesArray);
+
       setLimit(response.data.meta.count);
       setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
     }

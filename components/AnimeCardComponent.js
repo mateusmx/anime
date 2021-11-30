@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Link from 'next/link';
 
 import { Box, Grid, Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -28,20 +29,25 @@ export default function AnimeCardComponent({ anime } = anime) {
   return (
     <Grid key={anime.id} item={true} xs={12} md={6} lg={4} xl={3} p={2} sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center' }}>
       <Card sx={{ maxWidth: "500px", position: 'relative' }}>
-        <CardMedia
-          component="img"
-          alt={anime.title}
-          image={anime.img}
-        />
+        <Link href={`/anime/${anime.id}`}>
+          <CardMedia
+            sx={{ cursor: 'pointer' }}
+            component="img"
+            alt={anime.title}
+            image={anime.img}
+          />
+        </Link>
         <Box sx={{ position: 'absolute', top: '79%', backgroundColor: 'rgba(0,0,0,0.8)', width: '100%', color: 'white' }}>
-          <CardContent sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Typography gutterBottom variant="h5" component="div">
-              {anime.title}
-            </Typography>
-          </CardContent>
+          <Link href={`/anime/${anime.id}`}>
+            <CardContent sx={{ display: 'flex', justifyContent: 'center', cursor: 'pointer' }}>
+              <Typography gutterBottom variant="h5" component="div">
+                {anime.title}
+              </Typography>
+            </CardContent>
+          </Link>
           <CardActions sx={{ display: 'flex', justifyContent: 'space-around' }}>
             <Button size="small" sx={{ color: 'white' }} onClick={handleStarred}>
-              {starredAnimes.includes(anime.id) ? (<StarIcon fontSize="medium" sx={{ color: 'yellow' }} />) : (<StarBorderIcon fontSize="medium" />)}
+              {starredAnimes.includes(anime.id) ? (<StarIcon fontSize="medium" sx={{ color: 'gold' }} />) : (<StarBorderIcon fontSize="medium" />)}
 
               {anime.rating}
             </Button>

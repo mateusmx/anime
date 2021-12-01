@@ -155,7 +155,7 @@ export default function Anime() {
                     <Grid item={true} xs={12} sx={{ display: 'flex', justifyContent: 'start' }}>
                         <Link href="/"><Button variant="body2" color="initial">{"< Back"}</Button></Link>
                     </Grid>
-                    <Grid item={true} xs={12} md={3} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'center', alignItems: { xs: 'center', md: 'start' }, pl: 2 }}>
+                    <Grid item={true} xs={12} md={3} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'center', alignItems: { xs: 'center', md: 'start' }, pl: { md: 2 } }}>
                         <Card sx={{ maxWidth: 450 }}>
                             <CardMedia
                                 component="img"

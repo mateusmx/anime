@@ -12,42 +12,26 @@ function MyApp({ Component, pageProps }) {
   const watchedEpisodes = useSelector(state => state.main.watchedEpisodes)
 
   useEffect(() => {
-    const favoriteArray = [...window.localStorage.getItem('favoriteAnimes') || []]
-    const starredArray = [...window.localStorage.getItem('starredAnimes') || []]
-    const watchedArray = [window.localStorage.getItem('watchedEpisodes') || []]
 
-    if (watchedArray.length > 0 && watchedArray[0].length > 0) {
-      const splitting = watchedArray[0].split(",");
-      const watched = [];
-      splitting.map((val) => {
-        if (val) {
-          watched.push((val));
-        }
-      })
-      dispatch(initializeWatchedEpisodes(watched));
-    } else {
-      dispatch(initializeWatchedEpisodes([]));
-    }
+    const favoriteArray = JSON.parse(window.localStorage.getItem("favoriteAnimes")) || [];
+    const starredArray = JSON.parse(window.localStorage.getItem("starredAnimes")) || [];
+    const watchedArray = JSON.parse(window.localStorage.getItem('watchedEpisodes')) || [];
 
-
-    dispatch(initializeFavoriteAnimes(favoriteArray.filter((val) => val !== ',')));
-    dispatch(initializeStarredAnimes(starredArray.filter((val) => val !== ',')));
-    // dispatch(initializeWatchedEpisodes(watchedArray.filter((val) => val !== ',')));
+    dispatch(initializeFavoriteAnimes(favoriteArray));
+    dispatch(initializeStarredAnimes(starredArray));
+    dispatch(initializeWatchedEpisodes(watchedArray));
   }, []);
 
   useEffect(() => {
-    // window.localStorage.removeItem('favoriteAnimes');
-    window.localStorage.setItem('favoriteAnimes', favoriteAnimes);
+    window.localStorage.setItem('favoriteAnimes', JSON.stringify(favoriteAnimes));
   }, [favoriteAnimes]);
 
   useEffect(() => {
-    // window.localStorage.removeItem('starredAnimes');
-    window.localStorage.setItem('starredAnimes', starredAnimes);
+    window.localStorage.setItem('starredAnimes', JSON.stringify(starredAnimes));
   }, [starredAnimes]);
 
   useEffect(() => {
-    // window.localStorage.removeItem('starredAnimes');
-    window.localStorage.setItem('watchedEpisodes', watchedEpisodes);
+    window.localStorage.setItem('watchedEpisodes', JSON.stringify(watchedEpisodes));
   }, [watchedEpisodes]);
 
   return (

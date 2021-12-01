@@ -158,7 +158,6 @@ export default function Anime() {
                     <Grid item={true} xs={12} md={3} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'center', alignItems: { xs: 'center', md: 'start' }, pl: 2 }}>
                         <Card sx={{ maxWidth: 450 }}>
                             <CardMedia
-                                sx={{ cursor: 'pointer' }}
                                 component="img"
                                 alt={currentAnime.title}
                                 image={currentAnime.img}

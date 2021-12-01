@@ -4,15 +4,18 @@ import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { setAnimes, setNextPage } from '../redux/actions/main'
 
-import { Typography, Grid, Autocomplete, InputAdornment, TextField, Card, CardMedia, CardContent, CardActions, Button, Box } from '@mui/material';
+import { Typography, Grid, InputAdornment, TextField, Button } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import SearchIcon from '@mui/icons-material/Search';
 
+import { SpinningCircles } from 'react-loading-icons'
+
 import AnimeCardComponent from '../components/AnimeCardComponent';
 import InfiniteScroll from 'react-infinite-scroll-component';
+
 
 
 export default function Home() {
@@ -22,6 +25,7 @@ export default function Home() {
   const localNext = useSelector(state => state.main.next)
   const starredAnimes = useSelector(state => state.main.starredAnimes)
   const favoriteAnimes = useSelector(state => state.main.favoriteAnimes)
+
   const [next, setNext] = useState(localNext);
   const [hasMore, setHasMore] = useState(true);
   const [limit, setLimit] = useState(100000);
@@ -30,16 +34,16 @@ export default function Home() {
   const [displayingAnimes, setDisplayingAnimes] = useState(localAnimes ? [...localAnimes] : []);
   const [favoriteFilter, setFavoriteFilter] = useState(false);
   const [starredFilter, setStarredFilter] = useState(false);
-  const [searchFilter, setSearchFilter] = useState(false);
+  const [searchFilter, setSearchFilter] = useState('');
 
   useEffect(() => {
+    // If we don't have any available animes loaded, make the first load.
     if (availableAnimes.length === 0) {
       getData();
     }
 
     async function getData() {
       const response = await ax.get('/anime');
-      const animesArray = [];
       response.data.data.map((data) => {
         let anime = {};
         anime.id = data.id;
@@ -50,7 +54,6 @@ export default function Home() {
         anime.favorites = data.attributes.favoritesCount
         setAvailableAnimes((available) => [...available, anime]);
         setDisplayingAnimes((available) => [...available, anime]);
-        animesArray.push(anime);
       })
       setLimit(response.data.meta.count);
       setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
@@ -58,12 +61,19 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    // Adding available Animes so we don't lose them when clicking 'back'.
     dispatch(setAnimes(availableAnimes));
   }, [availableAnimes])
 
   useEffect(() => {
+    // Adding the next Page to redux state so we don't lose it when clicking 'back'.
     dispatch(setNextPage(next));
   }, [next])
+
+  useEffect(() => {
+    // Making the search filter to change the displaying animes
+    setDisplayingAnimes(availableAnimes.filter((anime) => anime.title.includes(searchFilter)));
+  }, [searchFilter])
 
 
 
@@ -119,7 +129,6 @@ export default function Home() {
     }
 
     const response = await ax.get(next);
-    const animesArray = [];
     response.data.data.map((data) => {
       let anime = {};
       anime.id = data.id;
@@ -130,10 +139,8 @@ export default function Home() {
       anime.favorites = data.attributes.favoritesCount
       setAvailableAnimes((available) => [...available, anime]);
       setDisplayingAnimes((available) => [...available, anime]);
-      animesArray.push(anime);
     })
     setNext((response.data.links.next).replace('https://kitsu.io/api/edge', ''));
-
   };
 
   return (
@@ -161,33 +168,29 @@ export default function Home() {
             </Button>
           </Grid>
           <Grid item={true} xs={12} md={4}>
-            <Autocomplete
+            <TextField
               sx={{
-                minWidth: '400px', '& .MuiOutlinedInput-root': {
+                '& .MuiOutlinedInput-root': {
                   borderRadius: "50px",
-                  padding: "2px"
+                  padding: '0px'
+                }, '& .MuiInputBase-input': {
+                  py: '4px'
                 }
               }}
-              freeSolo
-              disableClearable
-              options={displayingAnimes.length > 1 ? displayingAnimes.map((option) => option.title) : []}
-              renderInput={(params) => (
-                <TextField
-                  sx={{ borderRadius: "50px", padding: "0px" }}
-                  {...params}
-                  placeholder="Search Anime"
-                  variant="outlined"
-                  InputProps={{
-                    ...params.InputProps,
-                    type: 'search',
-                    startAdornment: (
-                      <InputAdornment position="start" sx={{ pl: "8px" }}>
-                        <SearchIcon />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              )}
+              fullWidth
+              placeholder="Search Anime"
+              variant="outlined"
+              InputProps={{
+                type: 'search',
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ pl: "8px" }}>
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+              onChange={(e) => {
+                setSearchFilter(e.target.value);
+              }}
             />
           </Grid>
           <Grid item={true} xs={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'end' } }}>
@@ -198,24 +201,56 @@ export default function Home() {
         {displayingAnimes.length > 0 ? (
           displayingAnimes.map((anime) => {
 
-            return (<AnimeCardComponent key={anime.id} anime={anime} availableAnimes={availableAnimes} setAvailableAnimes={setAvailableAnimes} />)
+            return (<AnimeCardComponent key={anime.id} anime={anime} />)
           })
-        ) : (favoriteFilter || starredFilter || searchFilter) ? ('No matching criteria, try another filter') : ('Loading ...')}
+        ) : (favoriteFilter || starredFilter || searchFilter) ? (
+          <Grid container sx={{ display: 'flex', justifyContent: 'center', pt: 5 }}>
+            <Typography variant="h5" color="initial">No matching criteria, try another filter</Typography>
+          </Grid>
 
-        {(favoriteFilter || starredFilter || searchFilter) ? null : (
-          <InfiniteScroll
-            dataLength={availableAnimes.length}
-            next={fetchMoreData}
-            hasMore={hasMore}
-            loader={<h4>Loading more awesome Animes ...</h4>}
-            endMessage={
-              <div>
-                Looks like those are all the animes
-              </div>
-            }
-          >
-          </InfiniteScroll>
+        ) : (
+          <Grid container sx={{ display: 'flex', justifyContent: 'center', pt: 5 }}>
+            <SpinningCircles
+              fill="#091a1f"
+              fillOpacity={0}
+              height="5em"
+              speed={2}
+              stroke="rgba(9, 20, 18, 0.87)"
+              strokeOpacity={1}
+              strokeWidth={0}
+              width="150px"
+            />
+          </Grid>
+
         )}
+
+        {(favoriteFilter || starredFilter || searchFilter) ? null : displayingAnimes.length > 0 ? (
+          <Grid item={true} xs={12} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'center', pt: 5, alignItems: 'center' }}>
+            <InfiniteScroll
+              dataLength={availableAnimes.length}
+              next={fetchMoreData}
+              hasMore={hasMore}
+              loader={
+                <SpinningCircles
+                  fill="#091a1f"
+                  fillOpacity={0}
+                  height="5em"
+                  speed={2}
+                  stroke="rgba(9, 20, 18, 0.87)"
+                  strokeOpacity={1}
+                  strokeWidth={0}
+                  width="150px"
+                />
+              }
+              endMessage={
+                <Grid container sx={{ display: 'flex', justifyContent: 'center', pt: 5 }}>
+                  <Typography variant="h5" color="initial"> Looks like those are all the animes</Typography>
+                </Grid>
+              }
+            >
+            </InfiniteScroll>
+          </Grid>
+        ) : null}
       </Grid>
     </>
   )

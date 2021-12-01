@@ -1,29 +1,31 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import ax from '../../axiosConfig';
+import { useRouter } from 'next/dist/client/router';
+
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { setAnimes, toggleFavoriteAnime, toggleStarredAnime, toggleWatchedEpisode } from '../../redux/actions/main'
+import { toggleFavoriteAnime, toggleStarredAnime, toggleWatchedEpisode } from '../../redux/actions/main'
 
-import { Typography, Grid, Autocomplete, InputAdornment, TextField, Card, CardMedia, CardContent, CardActions, Button, Box } from '@mui/material';
+import { Typography, Grid, Card, CardMedia, CardContent, Button, Box } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CheckIcon from '@mui/icons-material/Check';
 
-import { useRouter } from 'next/dist/client/router';
+import { SpinningCircles } from 'react-loading-icons'
 
 export default function Anime() {
-
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const [currentAnime, setCurrentAnime] = useState({});
-    const [loading, setLoading] = useState(true);
     const starredAnimes = useSelector(state => state.main.starredAnimes)
     const favoriteAnimes = useSelector(state => state.main.favoriteAnimes)
     const watchedEpisodes = useSelector(state => state.main.watchedEpisodes)
+
+    const [currentAnime, setCurrentAnime] = useState({});
+    const [loading, setLoading] = useState(true);
     const [characters, setCharacters] = useState([]);
     const [episodes, setEpisodes] = useState([]);
 
@@ -124,9 +126,18 @@ export default function Anime() {
 
     if (loading) {
         return (
-            <div>
-                Loading ...
-            </div>
+            <Grid container sx={{ display: 'flex', justifyContent: 'center', pt: 5 }}>
+                <SpinningCircles
+                    fill="#091a1f"
+                    fillOpacity={0}
+                    height="5em"
+                    speed={2}
+                    stroke="rgba(9, 20, 18, 0.87)"
+                    strokeOpacity={1}
+                    strokeWidth={0}
+                    width="150px"
+                />
+            </Grid>
         )
     } else {
         return (
@@ -209,7 +220,7 @@ export default function Anime() {
 
                             return (
                                 <Grid key={char.id} item={true} xs={12} md={6} lg={4} xl={3} p={2} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                    <Card sx={{ minWidth: '200px', maxWidth: "300px", maxHeight: '300px', position: 'relative' }}>
+                                    <Card sx={{ minWidth: '200px', maxWidth: "300px", minHeight: '250px', maxHeight: '300px', position: 'relative' }}>
                                         <CardMedia
                                             component="img"
                                             alt={char.name}
